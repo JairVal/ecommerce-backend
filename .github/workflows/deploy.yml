@@ -19,7 +19,7 @@ jobs:
         username: ${{ secrets.VPS_USER }}
         key: ${{ secrets.VPS_KEY }}
         source: "."
-        target: "/root/valvidieso_jair/nestjs-ecommerce-valdivieso-backend"
+        target: "/root/valdivieso_jair/nestjs-ecommerce-valdivieso-backend"
 
     - name: Run deploy commands on VPS
       uses: appleboy/ssh-action@v1.0.3
@@ -28,7 +28,7 @@ jobs:
         username: ${{ secrets.VPS_USER }}
         key: ${{ secrets.VPS_KEY }}
         script: |
-          cd /root/valvidieso_jair/nestjs-ecommerce-valdivieso-backend
+          cd /root/valdivieso_jair/nestjs-ecommerce-valdivieso-backend
           
           # Matar el proceso que está usando el puerto 3103
           echo "Matar proceso en el puerto 3103..."
