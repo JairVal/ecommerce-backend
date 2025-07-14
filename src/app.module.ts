@@ -44,5 +44,7 @@ import { ConfigModule } from '@nestjs/config';
     AuthModule,
     // Agrega aquí los demás módulos
   ],
+  controllers: [AppController],
+  providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
