@@ -30,9 +30,9 @@ jobs:
         script: |
           cd /root/valdivieso_jair/nestjs-ecommerce-valdivieso-backend
           
-          # Matar el proceso que está usando el puerto 3103
-          echo "Matar proceso en el puerto 3103..."
-          sudo lsof -t -i:3103 | xargs sudo kill -9  # Mata el proceso que usa el puerto 3103
+          # Matar el proceso que está usando el puerto 3104
+          echo "Matar proceso en el puerto 3104..."
+          sudo lsof -t -i:3104 | xargs sudo kill -9  # Mata el proceso que usa el puerto 3104
           
           # Asegúrate de que el archivo .env se copie correctamente
           echo -e "${{ secrets.ENV_FILE }}" > .env
