@@ -1,16 +1,23 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne, Column, CreateDateColumn, OneToMany, JoinColumn } from 'typeorm';
-import { Cliente } from '../clientes/cliente.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
+
 import { Usuario } from '../usuarios/usuario.entity';
 import { DetalleVenta } from './detalle-venta.entity';
-@Entity('ventas')
 
+@Entity('ventas')
 export class Venta {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Cliente, { eager: true })
-  @JoinColumn({ name: 'id_cliente' })
-  cliente: Cliente;
+  @Column({ nullable: true }) // ID del cliente en Mongo (ObjectId en string)
+  id_cliente: string;
 
   @ManyToOne(() => Usuario, { eager: true })
   @JoinColumn({ name: 'id_usuario' })
@@ -22,6 +29,9 @@ export class Venta {
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   total: number;
 
-  @OneToMany(() => DetalleVenta, detalle => detalle.venta, { cascade: true, eager: true })
+  @OneToMany(() => DetalleVenta, detalle => detalle.venta, {
+    cascade: true,
+    eager: true,
+  })
   detalles: DetalleVenta[];
 }

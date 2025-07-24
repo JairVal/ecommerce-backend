@@ -14,7 +14,7 @@ export class ClientesController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.clientesService.findOne(+id);
+    return this.clientesService.findOne(id); // 👈 id como string
   }
 
   @Post()
@@ -24,11 +24,11 @@ export class ClientesController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateClienteDto: UpdateClienteDto) {
-    return this.clientesService.update(+id, updateClienteDto);
+    return this.clientesService.update(id, updateClienteDto); // 👈 id como string
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.clientesService.remove(+id);
+    return this.clientesService.remove(id); // 👈 id como string
   }
 }

@@ -1,36 +1,37 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Cliente } from './cliente.entity';
-import { CreateClienteDto } from './dto/create-cliente.dto';
-import { UpdateClienteDto } from './dto/update-cliente.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, Types } from 'mongoose'; // Importa 'Types' para manejar 'ObjectId'
+import { Cliente, ClienteDocument } from './schemas/cliente.schema';
 import { LogsService } from 'src/logs/logs.service';
 
 @Injectable()
 export class ClientesService {
   constructor(
-    @InjectRepository(Cliente)
-    private readonly clienteRepository: Repository<Cliente>,
-    private readonly logsService: LogsService, 
+    @InjectModel(Cliente.name) private clienteModel: Model<ClienteDocument>,
+    private readonly logsService: LogsService,
   ) {}
 
-  findAll(): Promise<Cliente[]> {
-    return this.clienteRepository.find();
+  async findAll(): Promise<Cliente[]> {
+    return this.clienteModel.find().exec();
   }
 
-  async findOne(id: number): Promise<Cliente> {
-    const cliente = await this.clienteRepository.findOneBy({ id });
+  async findOne(id: string): Promise<Cliente> {
+    // Verifica si el id es válido
+    if (!Types.ObjectId.isValid(id)) {
+      throw new NotFoundException(`Cliente con id ${id} no encontrado`);
+    }
+
+    const cliente = await this.clienteModel.findById(id).exec();
     if (!cliente) {
       throw new NotFoundException(`Cliente con id ${id} no encontrado`);
     }
     return cliente;
   }
 
-  async create(data: CreateClienteDto): Promise<Cliente> {
-  const cliente = this.clienteRepository.create(data);
-  const savedClient = await this.clienteRepository.save(cliente);
+  async create(data: Partial<Cliente>): Promise<Cliente> {
+    const nuevoCliente = new this.clienteModel(data);
+    const savedClient = await nuevoCliente.save();
 
-    // Log automático
     await this.logsService.create({
       usuario: savedClient.nombre,
       accion: 'creacion-cliente',
@@ -40,15 +41,20 @@ export class ClientesService {
     return savedClient;
   }
 
-  async update(id: number, data: UpdateClienteDto): Promise<Cliente> {
-  const cliente = await this.clienteRepository.findOneBy({ id });
-  if (!cliente) {
-    throw new NotFoundException(`Cliente con id ${id} no encontrado`);
-  }
-  Object.assign(cliente, data);
-  const updatedClient = await this.clienteRepository.save(cliente);
+  async update(id: string, data: Partial<Cliente>): Promise<Cliente> {
+    // Verifica si el id es válido
+    if (!Types.ObjectId.isValid(id)) {
+      throw new NotFoundException(`Cliente con id ${id} no encontrado`);
+    }
 
-  // Log automático
+    const cliente = await this.clienteModel.findById(id);
+    if (!cliente) {
+      throw new NotFoundException(`Cliente con id ${id} no encontrado`);
+    }
+
+    Object.assign(cliente, data);
+    const updatedClient = await cliente.save();
+
     await this.logsService.create({
       usuario: updatedClient.nombre,
       accion: 'actualizacion-cliente',
@@ -57,14 +63,20 @@ export class ClientesService {
 
     return updatedClient;
   }
-async remove(id: number): Promise<void> {
-  const cliente = await this.clienteRepository.findOneBy({ id });
-  if (!cliente) {
-    throw new NotFoundException(`Cliente con id ${id} no encontrado`);
-  }
-  await this.clienteRepository.delete(id);
 
-    // Log automático
+  async remove(id: string): Promise<void> {
+    // Verifica si el id es válido
+    if (!Types.ObjectId.isValid(id)) {
+      throw new NotFoundException(`Cliente con id ${id} no encontrado`);
+    }
+
+    const cliente = await this.clienteModel.findById(id);
+    if (!cliente) {
+      throw new NotFoundException(`Cliente con id ${id} no encontrado`);
+    }
+
+    await this.clienteModel.findByIdAndDelete(id);
+
     await this.logsService.create({
       usuario: cliente.nombre,
       accion: 'eliminacion-cliente',

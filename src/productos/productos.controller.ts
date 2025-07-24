@@ -6,7 +6,7 @@ import { UpdateProductoDto } from './dto/update-producto.dto';
 @Controller('productos')
 export class ProductosController {
   constructor(private readonly productosService: ProductosService) {}
-
+  
   @Get()
   findAll() {
     return this.productosService.findAll();
